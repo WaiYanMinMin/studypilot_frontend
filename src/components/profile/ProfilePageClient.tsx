@@ -62,6 +62,12 @@ export function ProfilePageClient() {
     void loadAll();
   }, []);
 
+  useEffect(() => {
+    if (!initialLoading && !user) {
+      router.replace("/signin?callbackUrl=/profile");
+    }
+  }, [initialLoading, user, router]);
+
   if (initialLoading) {
     return (
       <main className="dashboardWrap pageLoadingWrap">
