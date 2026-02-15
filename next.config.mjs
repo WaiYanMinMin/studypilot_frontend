@@ -5,6 +5,7 @@ const nextConfig = {
       bodySizeLimit: "20mb"
     }
   },
+  turbopack: {},
   webpack: (config) => {
     config.resolve.alias.canvas = false;
     return config;
