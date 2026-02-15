@@ -35,7 +35,7 @@ export function FeedbackForm() {
           to_email: "waiyanminmin29@gmail.com",
           subject: "studyPilot feedback",
         },
-        EMAILJS_PUBLIC_KEY
+        EMAILJS_PUBLIC_KEY,
       );
       setMessage("Thanks! Your feedback has been emailed.");
       setName("");
