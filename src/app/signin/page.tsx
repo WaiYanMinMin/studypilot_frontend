@@ -76,6 +76,7 @@ function SignInPageContent() {
             <input
               id="email"
               type="email"
+              autoComplete="username"
               required
               placeholder="you@example.com"
               value={email}
@@ -87,6 +88,7 @@ function SignInPageContent() {
             <input
               id="password"
               type="password"
+              autoComplete="current-password"
               required
               placeholder="Enter your password"
               value={password}

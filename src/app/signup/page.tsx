@@ -83,6 +83,7 @@ function SignUpPageContent() {
             <input
               id="fullName"
               type="text"
+              autoComplete="name"
               required
               placeholder="Wai Yan Min Min"
               value={fullName}
@@ -94,6 +95,7 @@ function SignUpPageContent() {
             <input
               id="email"
               type="email"
+              autoComplete="username"
               required
               placeholder="you@example.com"
               value={email}
@@ -105,6 +107,7 @@ function SignUpPageContent() {
             <input
               id="password"
               type="password"
+              autoComplete="new-password"
               required
               placeholder="At least 8 characters"
               value={password}
@@ -116,6 +119,7 @@ function SignUpPageContent() {
             <input
               id="confirmPassword"
               type="password"
+              autoComplete="new-password"
               required
               placeholder="Re-enter your password"
               value={confirmPassword}

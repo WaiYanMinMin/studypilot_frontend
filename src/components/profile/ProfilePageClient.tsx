@@ -106,6 +106,7 @@ export function ProfilePageClient() {
               <label htmlFor="profile-fullname">Full Name</label>
               <input
                 id="profile-fullname"
+                autoComplete="name"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
               />
@@ -115,6 +116,7 @@ export function ProfilePageClient() {
               <input
                 id="profile-email"
                 type="email"
+                autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />

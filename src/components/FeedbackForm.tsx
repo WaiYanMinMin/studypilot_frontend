@@ -64,6 +64,7 @@ export function FeedbackForm() {
         <input
           id="feedback-name"
           type="text"
+          autoComplete="name"
           placeholder="Your name"
           required
           value={name}
@@ -75,6 +76,7 @@ export function FeedbackForm() {
         <input
           id="feedback-email"
           type="email"
+          autoComplete="email"
           placeholder="you@example.com"
           required
           value={email}
