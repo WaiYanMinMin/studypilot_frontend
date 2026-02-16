@@ -10,6 +10,8 @@ import {
   asJson,
   type DocumentListItem,
 } from "@/components/dashboard/dashboardApi";
+import { getAiConfig, isAiSetupComplete } from "@/lib/aiConfigApi";
+import { ApiError } from "@/lib/apiClient";
 
 const featureCards = [
   {
@@ -45,6 +47,8 @@ export function DashboardHome() {
   const selectedDocId = searchParams.get("doc") || "";
 
   const [docs, setDocs] = useState<DocumentListItem[]>([]);
+  const [aiReady, setAiReady] = useState(false);
+  const [aiLoading, setAiLoading] = useState(true);
 
   const selectedDoc = useMemo(
     () => docs.find((doc) => doc.id === selectedDocId) || null,
@@ -53,16 +57,29 @@ export function DashboardHome() {
 
   useEffect(() => {
     async function loadDocs() {
-      const result = asDocumentList(await asJson<unknown>(await apiFetch("/api/documents")));
-      setDocs(result);
-      if (!selectedDocId && result[0]) {
-        router.replace(
-          `/dashboard/choose?doc=${encodeURIComponent(result[0].id)}`,
-        );
-        return;
-      }
-      if (selectedDocId && !result.some((doc) => doc.id === selectedDocId)) {
-        router.replace("/dashboard/select");
+      try {
+        const [docsPayload, aiConfig] = await Promise.all([
+          asJson<unknown>(await apiFetch("/api/documents")),
+          getAiConfig()
+        ]);
+        const result = asDocumentList(docsPayload);
+        setDocs(result);
+        setAiReady(isAiSetupComplete(aiConfig));
+        if (!selectedDocId && result[0]) {
+          router.replace(
+            `/dashboard/choose?doc=${encodeURIComponent(result[0].id)}`,
+          );
+          return;
+        }
+        if (selectedDocId && !result.some((doc) => doc.id === selectedDocId)) {
+          router.replace("/dashboard/select");
+        }
+      } catch (error) {
+        if (error instanceof ApiError && error.status === 401) {
+          router.replace("/signin?callbackUrl=/dashboard/choose");
+        }
+      } finally {
+        setAiLoading(false);
       }
     }
     void loadDocs();
@@ -94,16 +111,32 @@ export function DashboardHome() {
         <p className="small">
           {selectedDoc ? selectedDoc.title : "Loading document selection..."}
         </p>
+        {!aiLoading && !aiReady ? (
+          <div className="resultCard">
+            <h4>Set Up OpenAI to Continue</h4>
+            <p>
+              Add your OpenAI API key and choose a model in Profile to unlock
+              AI tools.
+            </p>
+            <div className="row">
+              <Link href="/profile" className="ctaButton">
+                Open AI Settings
+              </Link>
+            </div>
+          </div>
+        ) : null}
         <div className="featureChoiceGrid">
           {featureCards.map((feature) => (
             <Link
               key={feature.title}
               href={
-                selectedDoc
+                selectedDoc && aiReady
                   ? `${feature.path}?doc=${encodeURIComponent(selectedDoc.id)}`
-                  : "/dashboard/select"
+                  : aiReady
+                    ? "/dashboard/select"
+                    : "/profile"
               }
-              className={`featureChoiceCard ${selectedDoc ? "" : "disabled"}`}
+              className={`featureChoiceCard ${selectedDoc && aiReady ? "" : "disabled"}`}
             >
               <h4>{feature.title}</h4>
               <p>{feature.desc}</p>

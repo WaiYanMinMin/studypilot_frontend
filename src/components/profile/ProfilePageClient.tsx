@@ -5,6 +5,14 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/apiClient";
 import { asDocumentList, type DocumentListItem } from "@/components/dashboard/dashboardApi";
+import {
+  FALLBACK_MODELS,
+  getAiConfig,
+  revokeAiKey,
+  type AiConfigResponse,
+  updateAiConfig
+} from "@/lib/aiConfigApi";
+import { ApiError } from "@/lib/apiClient";
 
 type ProfileUser = {
   id: string;
@@ -30,6 +38,9 @@ export function ProfilePageClient() {
   const [busy, setBusy] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [docsLoading, setDocsLoading] = useState(true);
+  const [aiConfig, setAiConfig] = useState<AiConfigResponse | null>(null);
+  const [aiApiKey, setAiApiKey] = useState("");
+  const [aiModel, setAiModel] = useState("");
   const [status, setStatus] = useState("Update your profile and manage your uploaded files.");
 
   async function loadProfile() {
@@ -51,10 +62,19 @@ export function ProfilePageClient() {
     }
   }
 
+  async function loadAiSettings() {
+    const config = await getAiConfig();
+    setAiConfig({
+      ...config,
+      allowedModels: config.allowedModels.length ? config.allowedModels : FALLBACK_MODELS
+    });
+    setAiModel(config.model || config.allowedModels[0] || FALLBACK_MODELS[0] || "");
+  }
+
   useEffect(() => {
     async function loadAll() {
       try {
-        await Promise.all([loadProfile(), loadDocuments()]);
+        await Promise.all([loadProfile(), loadDocuments(), loadAiSettings()]);
       } finally {
         setInitialLoading(false);
       }
@@ -155,6 +175,121 @@ export function ProfilePageClient() {
             >
               Save Changes
             </button>
+
+            <hr style={{ margin: "10px 0", borderColor: "rgba(110,130,180,0.35)" }} />
+
+            <h4>AI Settings</h4>
+            <p className="small">
+              AI key: {aiConfig?.hasApiKey ? "Connected" : "Not connected"}{" "}
+              • Model: {aiConfig?.model || "Not selected"}
+            </p>
+            <div className="authField">
+              <label htmlFor="profile-ai-key">OpenAI API Key</label>
+              <input
+                id="profile-ai-key"
+                type="password"
+                minLength={20}
+                placeholder="sk-... (leave empty if unchanged)"
+                value={aiApiKey}
+                onChange={(e) => setAiApiKey(e.target.value)}
+              />
+            </div>
+            <div className="authField">
+              <label htmlFor="profile-ai-model">OpenAI Model</label>
+              <select
+                id="profile-ai-model"
+                value={aiModel}
+                onChange={(e) => setAiModel(e.target.value)}
+              >
+                {(aiConfig?.allowedModels || FALLBACK_MODELS).map((model) => (
+                  <option key={model} value={model}>
+                    {model}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="row">
+              <button
+                className="ctaButton"
+                disabled={busy || (!aiModel && aiApiKey.trim().length < 20)}
+                onClick={async () => {
+                  if (!aiModel && aiApiKey.trim().length < 20) return;
+                  if (aiApiKey && aiApiKey.trim().length < 20) {
+                    setStatus("API key must be at least 20 characters.");
+                    return;
+                  }
+                  setBusy(true);
+                  setStatus("Saving AI settings...");
+                  try {
+                    const next = await updateAiConfig({
+                      apiKey: aiApiKey.trim() || undefined,
+                      model: aiModel || undefined
+                    });
+                    setAiConfig({
+                      hasApiKey: next.hasApiKey,
+                      model: next.model,
+                      allowedModels: next.allowedModels.length
+                        ? next.allowedModels
+                        : FALLBACK_MODELS
+                    });
+                    setAiApiKey("");
+                    setAiModel(next.model || aiModel);
+                    setStatus("AI settings updated.");
+                  } catch (error) {
+                    if (error instanceof ApiError && error.status === 401) {
+                      router.replace("/signin?callbackUrl=/profile");
+                      return;
+                    }
+                    setStatus(error instanceof Error ? error.message : "AI update failed.");
+                  } finally {
+                    setBusy(false);
+                  }
+                }}
+              >
+                Save AI Settings
+              </button>
+              <button
+                className="ghostButton danger"
+                disabled={busy || !aiConfig?.hasApiKey}
+                onClick={async () => {
+                  if (!window.confirm("Revoke your OpenAI API key from this app?")) {
+                    return;
+                  }
+                  setBusy(true);
+                  setStatus("Revoking API key...");
+                  try {
+                    const revoked = await revokeAiKey();
+                    setAiConfig((prev) =>
+                      prev
+                        ? {
+                            ...prev,
+                            hasApiKey: revoked.hasApiKey,
+                            model: revoked.model
+                          }
+                        : {
+                            hasApiKey: revoked.hasApiKey,
+                            model: revoked.model,
+                            allowedModels: FALLBACK_MODELS
+                          }
+                    );
+                    setAiApiKey("");
+                    setStatus(
+                      "API key revoked. AI tools are now locked until you add a key again."
+                    );
+                  } catch (error) {
+                    if (error instanceof ApiError && error.status === 401) {
+                      router.replace("/signin?callbackUrl=/profile");
+                      return;
+                    }
+                    setStatus(error instanceof Error ? error.message : "Failed to revoke API key.");
+                  } finally {
+                    setBusy(false);
+                  }
+                }}
+              >
+                Revoke API Key
+              </button>
+            </div>
           </div>
         </section>
 

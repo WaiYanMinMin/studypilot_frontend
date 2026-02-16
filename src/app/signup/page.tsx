@@ -3,7 +3,13 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
-import { apiFetch } from "@/lib/apiClient";
+import { ApiError, apiFetch, apiFetchJson } from "@/lib/apiClient";
+import {
+  FALLBACK_MODELS,
+  getAiConfig,
+  isAiSetupComplete,
+  updateAiConfig
+} from "@/lib/aiConfigApi";
 
 function SignUpPageContent() {
   const router = useRouter();
@@ -14,8 +20,13 @@ function SignUpPageContent() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [apiKey, setApiKey] = useState("");
+  const [model, setModel] = useState("");
+  const [allowedModels, setAllowedModels] = useState<string[]>(FALLBACK_MODELS);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [needsAiRetry, setNeedsAiRetry] = useState(false);
+  const [signupSuccess, setSignupSuccess] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -27,8 +38,15 @@ function SignUpPageContent() {
           user: { id: string; fullName: string; email: string } | null;
         };
         if (!body.user) return;
+        const aiConfig = await getAiConfig();
+        if (!active) return;
+        setAllowedModels(
+          aiConfig.allowedModels.length ? aiConfig.allowedModels : FALLBACK_MODELS
+        );
+        setModel((prev) => prev || aiConfig.model || aiConfig.allowedModels[0] || "");
+        if (needsAiRetry || !isAiSetupComplete(aiConfig)) return;
         router.replace(callbackUrl);
-      } catch {
+      } catch (_error) {
         // No active session; stay on sign-up page.
       }
     }
@@ -36,14 +54,33 @@ function SignUpPageContent() {
     return () => {
       active = false;
     };
-  }, [router, callbackUrl]);
+  }, [router, callbackUrl, needsAiRetry]);
+
+  async function saveAiSetup() {
+    const result = await updateAiConfig({ apiKey, model });
+    setAllowedModels(result.allowedModels.length ? result.allowedModels : FALLBACK_MODELS);
+    setModel(result.model || model);
+    setNeedsAiRetry(false);
+    setSignupSuccess(false);
+    router.push(callbackUrl);
+    router.refresh();
+  }
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (apiKey.trim().length < 20) {
+      setError("Please enter a valid OpenAI API key (minimum 20 characters).");
+      return;
+    }
+    if (!model) {
+      setError("Please select an OpenAI model.");
+      return;
+    }
+
     setBusy(true);
     setError("");
     try {
-      const res = await apiFetch("/api/auth/signup", {
+      await apiFetchJson("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -53,11 +90,24 @@ function SignUpPageContent() {
           confirmPassword
         })
       });
-      const body = await res.json();
-      if (!res.ok) throw new Error(body.error || "Signup failed.");
-      router.push(callbackUrl);
-      router.refresh();
+      setSignupSuccess(true);
+      try {
+        await saveAiSetup();
+      } catch (setupError) {
+        setNeedsAiRetry(true);
+        const message =
+          setupError instanceof Error
+            ? setupError.message
+            : "Account created, but AI setup failed.";
+        setError(
+          `${message} Please retry AI setup below to continue.`
+        );
+      }
     } catch (err) {
+      if (err instanceof ApiError && err.status === 401) {
+        router.replace("/signin?callbackUrl=/signup");
+        return;
+      }
       setError(err instanceof Error ? err.message : "Signup failed.");
     } finally {
       setBusy(false);
@@ -125,9 +175,65 @@ function SignUpPageContent() {
               onChange={(e) => setConfirmPassword(e.target.value)}
             />
           </div>
+          <div className="authField">
+            <label htmlFor="openai-api-key">OpenAI API Key</label>
+            <input
+              id="openai-api-key"
+              type="password"
+              required
+              minLength={20}
+              placeholder="sk-..."
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+            />
+            <p className="small">Required to run AI answers, summaries, and quizzes.</p>
+          </div>
+          <div className="authField">
+            <label htmlFor="openai-model">OpenAI Model</label>
+            <select
+              id="openai-model"
+              required
+              value={model}
+              onChange={(e) => setModel(e.target.value)}
+            >
+              <option value="">Select a model</option>
+              {allowedModels.map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
+          </div>
           <button className="ctaButton authSubmit" disabled={busy}>
             {busy ? "Creating account..." : "Sign Up"}
           </button>
+          {needsAiRetry ? (
+            <button
+              type="button"
+              className="ghostButton authSubmit"
+              disabled={busy || apiKey.trim().length < 20 || !model}
+              onClick={async () => {
+                setBusy(true);
+                setError("");
+                try {
+                  await saveAiSetup();
+                } catch (setupError) {
+                  setError(
+                    setupError instanceof Error
+                      ? setupError.message
+                      : "Failed to save AI settings."
+                  );
+                } finally {
+                  setBusy(false);
+                }
+              }}
+            >
+              Retry AI Setup
+            </button>
+          ) : null}
+          {signupSuccess && needsAiRetry ? (
+            <p className="small">Your account is created. Complete AI setup to continue.</p>
+          ) : null}
           {error ? <p className="authError">{error}</p> : null}
         </form>
         <p className="small authFooterText">

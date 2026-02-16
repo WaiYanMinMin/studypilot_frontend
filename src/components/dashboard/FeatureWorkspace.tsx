@@ -3,7 +3,7 @@
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useEffect, useMemo, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { ReactNode } from "react";
 
 import {
@@ -12,6 +12,8 @@ import {
   type DocumentListItem
 } from "@/components/dashboard/dashboardApi";
 import { apiFetch } from "@/lib/apiClient";
+import { getAiConfig, isAiSetupComplete } from "@/lib/aiConfigApi";
+import { ApiError } from "@/lib/apiClient";
 
 const PdfSelectionViewer = dynamic(
   () =>
@@ -41,13 +43,17 @@ export function FeatureWorkspace({
   children: (props: FeatureWorkspaceRenderProps) => ReactNode;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
+  const searchParamsString = searchParams.toString();
   const queryDocId = searchParams.get("doc") || "";
 
   const [docs, setDocs] = useState<DocumentListItem[]>([]);
   const [highlightText, setHighlightText] = useState("");
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState("Ready to study.");
+  const [aiReady, setAiReady] = useState(false);
+  const [aiLoading, setAiLoading] = useState(true);
 
   const selectedDoc = useMemo(
     () => docs.find((doc) => doc.id === queryDocId) || null,
@@ -56,24 +62,62 @@ export function FeatureWorkspace({
 
   useEffect(() => {
     async function loadDocs() {
-      const result = asDocumentList(await asJson<unknown>(await apiFetch("/api/documents")));
-      setDocs(result);
-      if (!queryDocId) {
-        router.replace("/dashboard/select");
-        return;
-      }
-      if (!result.some((doc) => doc.id === queryDocId)) {
-        router.replace("/dashboard/select");
+      try {
+        const [docsPayload, aiConfig] = await Promise.all([
+          asJson<unknown>(await apiFetch("/api/documents")),
+          getAiConfig(),
+        ]);
+        const result = asDocumentList(docsPayload);
+        setDocs(result);
+        setAiReady(isAiSetupComplete(aiConfig));
+        if (!queryDocId) {
+          router.replace("/dashboard/select");
+          return;
+        }
+        if (!result.some((doc) => doc.id === queryDocId)) {
+          router.replace("/dashboard/select");
+        }
+      } catch (error) {
+        if (error instanceof ApiError && error.status === 401) {
+          const callbackUrl = `${pathname}${searchParamsString ? `?${searchParamsString}` : ""}`;
+          router.replace(`/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`);
+        }
+      } finally {
+        setAiLoading(false);
       }
     }
     void loadDocs();
-  }, [queryDocId, router]);
+  }, [queryDocId, router, pathname, searchParamsString]);
 
-  if (!selectedDoc) {
+  if (aiLoading || !selectedDoc) {
     return (
       <main className="dashboardWrap">
         <section className="panel stepPanel">
-          <p className="small">Loading selected PDF...</p>
+          <p className="small">{aiLoading ? "Checking AI setup..." : "Loading selected PDF..."}</p>
+        </section>
+      </main>
+    );
+  }
+
+  if (!aiReady) {
+    return (
+      <main className="dashboardWrap">
+        <section className="panel stepPanel">
+          <h2>OpenAI Setup Needed</h2>
+          <p className="small">
+            Add your OpenAI API key and choose a model before using AI study tools.
+          </p>
+          <div className="row" style={{ marginTop: 12 }}>
+            <Link href="/profile" className="ctaButton">
+              Open AI Settings
+            </Link>
+            <Link
+              href={`/dashboard/choose?doc=${encodeURIComponent(selectedDoc.id)}`}
+              className="ghostButton"
+            >
+              Back to Tools
+            </Link>
+          </div>
         </section>
       </main>
     );
