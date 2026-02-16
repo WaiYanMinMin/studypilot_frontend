@@ -947,6 +947,31 @@ textarea {
   box-shadow: 0 0 0 3px rgba(110, 166, 255, 0.18);
 }
 
+.authField select {
+  width: 100%;
+  border: 1px solid #344474;
+  border-radius: 12px;
+  background: #0f162d;
+  color: #edf1ff;
+  padding: 11px 12px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.authField select:focus {
+  border-color: #6ea6ff;
+  box-shadow: 0 0 0 3px rgba(110, 166, 255, 0.18);
+}
+
+.authField select.modelSelect {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 20 20'%3E%3Cpath fill='%23c7d0f3' d='M5.5 7.5L10 12l4.5-4.5 1.5 1.5-6 6-6-6z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 14px 14px;
+  padding-right: 38px;
+}
+
 .authSubmit {
   width: 100%;
   margin-top: 2px;

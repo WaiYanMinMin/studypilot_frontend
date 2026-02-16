@@ -42,6 +42,7 @@ export function ProfilePageClient() {
   const [aiApiKey, setAiApiKey] = useState("");
   const [aiModel, setAiModel] = useState("");
   const [status, setStatus] = useState("Update your profile and manage your uploaded files.");
+  const hasSavedAiKey = Boolean(aiConfig?.hasApiKey);
 
   async function loadProfile() {
     const profile = await asJson<{ user: ProfileUser | null }>(await apiFetch("/api/auth/me"));
@@ -189,15 +190,20 @@ export function ProfilePageClient() {
                 id="profile-ai-key"
                 type="password"
                 minLength={20}
-                placeholder="sk-... (leave empty if unchanged)"
-                value={aiApiKey}
+                placeholder={hasSavedAiKey ? "API key connected" : "sk-..."}
+                value={hasSavedAiKey ? "••••••••••••••••••••" : aiApiKey}
+                disabled={busy || hasSavedAiKey}
                 onChange={(e) => setAiApiKey(e.target.value)}
               />
+              {hasSavedAiKey ? (
+                <p className="small">Your key is hidden. Revoke it first to set a new key.</p>
+              ) : null}
             </div>
             <div className="authField">
               <label htmlFor="profile-ai-model">OpenAI Model</label>
               <select
                 id="profile-ai-model"
+                className="modelSelect"
                 value={aiModel}
                 onChange={(e) => setAiModel(e.target.value)}
               >
@@ -211,10 +217,13 @@ export function ProfilePageClient() {
             <div className="row">
               <button
                 className="ctaButton"
-                disabled={busy || (!aiModel && aiApiKey.trim().length < 20)}
+                disabled={busy || !aiModel || (!hasSavedAiKey && aiApiKey.trim().length < 20)}
                 onClick={async () => {
-                  if (!aiModel && aiApiKey.trim().length < 20) return;
-                  if (aiApiKey && aiApiKey.trim().length < 20) {
+                  if (!aiModel) {
+                    setStatus("Please select a model.");
+                    return;
+                  }
+                  if (!hasSavedAiKey && aiApiKey.trim().length < 20) {
                     setStatus("API key must be at least 20 characters.");
                     return;
                   }
@@ -222,7 +231,7 @@ export function ProfilePageClient() {
                   setStatus("Saving AI settings...");
                   try {
                     const next = await updateAiConfig({
-                      apiKey: aiApiKey.trim() || undefined,
+                      apiKey: hasSavedAiKey ? undefined : aiApiKey.trim() || undefined,
                       model: aiModel || undefined
                     });
                     setAiConfig({

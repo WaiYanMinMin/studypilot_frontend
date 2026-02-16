@@ -192,6 +192,7 @@ function SignUpPageContent() {
             <label htmlFor="openai-model">OpenAI Model</label>
             <select
               id="openai-model"
+              className="modelSelect"
               required
               value={model}
               onChange={(e) => setModel(e.target.value)}
