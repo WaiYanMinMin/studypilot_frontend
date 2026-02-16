@@ -27,14 +27,14 @@ export function QuizFeaturePage() {
 
   return (
     <FeatureWorkspace
-      title="Mastery Check"
-      description="Evaluate comprehension with an adaptive-style quiz and instant feedback."
+      title="Practice Quiz"
+      description="Test your understanding with a quiz based on your lecture file."
     >
       {({ selectedDoc, selectedDocIds, busy, setBusy, setStatus }) => (
         <div>
-          <h3>Knowledge Assessment</h3>
+          <h3>Quiz Time</h3>
           <p className="small">
-            Generate assessment questions from the selected document and evaluate performance.
+            Practice with instant feedback and improve your weak areas.
           </p>
           <button
             className="ctaButton"
@@ -42,7 +42,7 @@ export function QuizFeaturePage() {
             onClick={async () => {
               if (!selectedDoc) return;
               setBusy(true);
-              setStatus("Generating assessment...");
+              setStatus("Creating quiz...");
               try {
                 const response = await asJson<ResourcesResult>(
                   await apiFetch("/api/resources", {
@@ -53,15 +53,15 @@ export function QuizFeaturePage() {
                 );
                 setQuiz(response.quiz);
                 setAnswers({});
-                setStatus("Assessment ready.");
+                setStatus("Quiz ready.");
               } catch (error) {
-                setStatus(error instanceof Error ? error.message : "Assessment generation failed.");
+                setStatus(error instanceof Error ? error.message : "Quiz generation failed.");
               } finally {
                 setBusy(false);
               }
             }}
           >
-            Generate Assessment
+            Generate Quiz
           </button>
 
           {quiz.length ? (

@@ -7,32 +7,32 @@ export default function PrivacyPage() {
         <p className="smallTag">StudyPilot AI</p>
         <h1>Privacy Policy</h1>
         <p>
-          We value your privacy. This page explains what data is collected and how it
-          is used in the StudyPilot AI application.
+          Your privacy matters. This page explains what data we collect and how we use
+          it to run StudyPilot AI.
         </p>
 
         <h3>Information We Store</h3>
         <p>
-          We store account information (name, email), uploaded document metadata, and
-          extracted lecture text required for search and AI features.
+          We store your account info (name and email), document metadata, and extracted
+          lecture text needed for search and AI features.
         </p>
 
         <h3>How We Use Data</h3>
         <p>
-          Your data is used only to provide product functionality: authentication,
-          document retrieval, AI responses, and generated study resources.
+          Your data is used only to support core features: login, file access, AI
+          answers, and generated study resources.
         </p>
 
         <h3>File Access Control</h3>
         <p>
-          Uploaded files are linked to your user account. Only authenticated users can
-          access their own files through authorized backend endpoints.
+          Each uploaded file is linked to your account. Only authenticated users can
+          access their own files through authorized API endpoints.
         </p>
 
         <h3>Data Security</h3>
         <p>
-          We use backend access controls and private storage patterns to protect your
-          content. You may delete uploaded files from your account pages.
+          We use account-based access control and private storage patterns to protect
+          your content. You can delete uploaded files anytime from your account page.
         </p>
 
         <h3>Contact</h3>

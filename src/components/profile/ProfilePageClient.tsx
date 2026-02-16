@@ -30,7 +30,7 @@ export function ProfilePageClient() {
   const [busy, setBusy] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [docsLoading, setDocsLoading] = useState(true);
-  const [status, setStatus] = useState("Manage your profile and document library.");
+  const [status, setStatus] = useState("Update your profile and manage your uploaded files.");
 
   async function loadProfile() {
     const profile = await asJson<{ user: ProfileUser | null }>(await apiFetch("/api/auth/me"));
@@ -81,7 +81,7 @@ export function ProfilePageClient() {
       <header className="dashboardTopbar">
         <div>
           <p className="smallTag">Account</p>
-          <h1>Profile & Document Library</h1>
+          <h1>Your Profile & Files</h1>
         </div>
         <div className="row">
           <button className="ghostButton" onClick={() => router.back()}>
@@ -106,7 +106,7 @@ export function ProfilePageClient() {
       <div className="featurePageGrid">
         <section className="panel">
           <h3>Profile Details</h3>
-          <p className="small">Update your name and contact email.</p>
+          <p className="small">Keep your name and email up to date.</p>
           <div className="authForm">
             <div className="authField">
               <label htmlFor="profile-fullname">Full Name</label>
@@ -133,7 +133,7 @@ export function ProfilePageClient() {
               onClick={async () => {
                 if (!user) return;
                 setBusy(true);
-                setStatus("Saving profile updates...");
+                setStatus("Saving your changes...");
                 try {
                   const result = await asJson<{ user: ProfileUser }>(
                     await apiFetch("/api/auth/me", {
@@ -143,7 +143,7 @@ export function ProfilePageClient() {
                     })
                   );
                   setUser(result.user);
-                  setStatus("Profile updated successfully.");
+                  setStatus("Profile updated.");
                 } catch (error) {
                   setStatus(
                     error instanceof Error ? error.message : "Profile update failed."
@@ -159,8 +159,8 @@ export function ProfilePageClient() {
         </section>
 
         <section className="panel">
-          <h3>Your Uploaded Files</h3>
-          <p className="small">Review and remove files from your account.</p>
+          <h3>Your Uploaded PDFs</h3>
+          <p className="small">See your files and remove any you no longer need.</p>
           {docsLoading ? (
             <div className="inlineLoaderWrap">
               <div className="loaderRing" aria-label="Loading uploaded files" />

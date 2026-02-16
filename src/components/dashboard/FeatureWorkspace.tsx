@@ -47,7 +47,7 @@ export function FeatureWorkspace({
   const [docs, setDocs] = useState<DocumentListItem[]>([]);
   const [highlightText, setHighlightText] = useState("");
   const [busy, setBusy] = useState(false);
-  const [status, setStatus] = useState("Workspace ready.");
+  const [status, setStatus] = useState("Ready to study.");
 
   const selectedDoc = useMemo(
     () => docs.find((doc) => doc.id === queryDocId) || null,
@@ -89,16 +89,16 @@ export function FeatureWorkspace({
         </div>
         <div className="row">
           <Link href="/dashboard/select" className="ghostButton">
-            Switch Document
+            Change File
           </Link>
           <Link
             href={`/dashboard/choose?doc=${encodeURIComponent(selectedDoc.id)}`}
             className="ghostButton"
           >
-            Switch Workflow
+            Change Tool
           </Link>
           <Link href="/" className="ghostButton">
-            Return to Landing
+            Back Home
           </Link>
         </div>
       </header>
@@ -117,7 +117,7 @@ export function FeatureWorkspace({
           <p className="small">Status: {status}</p>
         </section>
         <section className="panel">
-          <h3>Document Viewer</h3>
+          <h3>PDF Viewer</h3>
           <div className="pdfWrap largePdf">
             <PdfSelectionViewer
               file={selectedDoc.fileUrl}

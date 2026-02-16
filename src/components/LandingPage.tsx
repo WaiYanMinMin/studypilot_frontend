@@ -8,38 +8,38 @@ import { apiFetch } from "@/lib/apiClient";
 
 const features = [
   {
-    title: "Focused Feature Workflow",
+    title: "Simple 3-Step Study Flow",
     description:
-      "Upload/select one PDF first, then choose one task at a time for a clean study flow."
+      "Pick your file, choose a tool, and focus on one task at a time without feeling overwhelmed."
   },
  
   {
-    title: "Multiple Study Tools",
+    title: "Tools for Real Study Sessions",
     description:
-      "Summary, Q&A, highlight Q&A, cheat sheet, and quiz each have dedicated pages."
+      "Get summaries, ask questions, explain highlights, build cheat sheets, and practice with quizzes."
   }
 ];
 
 const highlights = [
-  "Built for university and self-paced learners",
-  "Easily upload your study materials and ask AI questions about them",
-  "Extract only what you need to study and focus on your learning"
+  "Built for university students and self-learners",
+  "Upload your lecture slides and ask questions instantly",
+  "Focus on key concepts instead of rereading everything"
 ];
 
 const steps = [
   {
-    title: "Upload Lecture PDFs",
-    detail: "Upload a new PDF or choose one from your previous uploads."
+    title: "Upload Your Lecture PDF",
+    detail: "Add a new file or pick one you already uploaded."
   },
   {
-    title: "Choose One Study Feature",
+    title: "Pick How You Want to Study",
     detail:
-      "Open Summary, Ask, Highlight Ask, Cheat Sheet, or Quiz as separate focused pages."
+      "Choose Summary, Ask, Highlight Help, Cheat Sheet, or Quiz on separate focused pages."
   },
   {
-    title: "Come back to your study materials anytime",
+    title: "Come Back Anytime",
     detail:
-      "Your study materials are always available for you to review and study."
+      "Your files stay ready whenever you want to review and practice again."
   }
 ];
 
@@ -112,18 +112,18 @@ export function LandingPage() {
       </header>
 
       <section className="hero">
-        <p className="badge">Built for students and educators</p>
-        <h1>Turn Lecture Slides into a Personal AI Study System</h1>
+        <p className="badge">Made for students</p>
+        <h1>Turn Lecture Slides into Easy Study Sessions</h1>
         <p className="heroSub">
-          Follow a focused workflow: select a PDF, pick one feature, and study with a
-          large in-view document for better context.
+          Stop jumping between notes and tabs. Upload your slides, choose a tool, and
+          study with your PDF always visible.
         </p>
         <div className="heroActions">
           <Link href="/signup?callbackUrl=/dashboard/select" className="ctaButton large">
-            Start Studying
+            Start for Free
           </Link>
           <a href="#features" className="ghostButton large">
-            See Features
+            Explore Features
           </a>
         </div>
       </section>
@@ -149,7 +149,7 @@ export function LandingPage() {
       <section className="howItWorks">
         <div className="sectionHeader">
           <p className="badge">How It Works</p>
-          <h2>From lecture slides to exam-ready confidence</h2>
+          <h2>From lecture slides to exam confidence</h2>
         </div>
         <div className="stepsGrid">
           {steps.map((step, idx) => (
@@ -163,14 +163,14 @@ export function LandingPage() {
       </section>
 
       <section className="finalCta">
-        <h2>Study smarter this semester.</h2>
+        <h2>Make studying feel less stressful.</h2>
         <p>
           Join students using StudyPilot AI to understand faster, revise better, and
-          score higher.
+          walk into exams more prepared.
         </p>
         <div className="heroActions">
           <Link href="/signup?callbackUrl=/dashboard/select" className="ctaButton large">
-            Create Free Account
+            Create My Account
           </Link>
           <Link href="/signin?callbackUrl=/dashboard/select" className="ghostButton large">
             I already have an account
@@ -181,11 +181,11 @@ export function LandingPage() {
       <section id="contact" className="contactSection">
         <div className="sectionHeader">
           <p className="badge">Contact</p>
-          <h2>Need help or want to collaborate?</h2>
+          <h2>Need help with StudyPilot?</h2>
         </div>
         <p className="contactLead">
-          Reach out directly for product support, student pilot programs, or
-          collaboration opportunities.
+          Reach out anytime for support, feedback, or ideas to make the app better for
+          students.
         </p>
         <div className="contactGrid">
           <a className="contactCard" href="mailto:waiyanminmin29@gmail.com">
@@ -210,7 +210,7 @@ export function LandingPage() {
       <footer className="landingFooter">
         <div>
           <strong>StudyPilot AI</strong>
-          <p className="small">AI Study Assistant for modern students</p>
+          <p className="small">Your AI study buddy for lectures and revision</p>
         </div>
         <div className="footerLinks">
           <Link href="/signin?callbackUrl=/dashboard/select">Sign In</Link>

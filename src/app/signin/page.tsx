@@ -61,15 +61,14 @@ function SignInPageContent() {
     <main className="authShell">
       <section className="authHero">
         <p className="badge">Welcome back</p>
-        <h1>Continue your study sessions</h1>
+        <h1>Pick up where you left off</h1>
         <p>
-          Sign in to access your uploaded lectures, highlight context, and AI study
-          tools.
+          Sign in to open your files, continue your notes, and keep studying with AI.
         </p>
       </section>
       <section className="authCard">
         <h2>Sign In</h2>
-        <p className="small">Use your email and password to continue.</p>
+        <p className="small">Use your student account to continue.</p>
         <form className="authForm" onSubmit={onSubmit}>
           <div className="authField">
             <label htmlFor="email">Email</label>
@@ -90,7 +89,7 @@ function SignInPageContent() {
               type="password"
               autoComplete="current-password"
               required
-              placeholder="Enter your password"
+              placeholder="Your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
@@ -103,7 +102,7 @@ function SignInPageContent() {
         <p className="small authFooterText">
           New here?{" "}
           <Link className="authLink" href={`/signup?callbackUrl=${encodeURIComponent(callbackUrl)}`}>
-            Create account
+            Create an account
           </Link>
         </p>
       </section>

@@ -13,28 +13,28 @@ import {
 
 const featureCards = [
   {
-    title: "Executive Summary",
-    desc: "Produce a structured overview of the selected lecture deck for rapid review.",
+    title: "Quick Summary",
+    desc: "Get the key ideas from your lecture quickly before deep review.",
     path: "/dashboard/summary",
   },
   {
-    title: "Contextual Q&A",
-    desc: "Ask domain-specific questions and receive evidence-grounded responses.",
+    title: "Ask Anything",
+    desc: "Ask questions about your slides and get clear, context-based answers.",
     path: "/dashboard/ask",
   },
   {
-    title: "Highlight Analysis",
-    desc: "Investigate selected PDF excerpts with focused, context-aware clarification.",
+    title: "Explain My Highlight",
+    desc: "Highlight confusing text and get a simple explanation right away.",
     path: "/dashboard/highlight",
   },
   {
-    title: "Revision Brief",
-    desc: "Generate a polished study brief with key concepts, formulas, and takeaways.",
+    title: "Cheat Sheet Builder",
+    desc: "Create a clean revision sheet with formulas, terms, and key points.",
     path: "/dashboard/cheatsheet",
   },
   {
-    title: "Mastery Check",
-    desc: "Assess comprehension through an interactive quiz with immediate feedback.",
+    title: "Practice Quiz",
+    desc: "Test yourself with instant feedback and learn from mistakes.",
     path: "/dashboard/quiz",
   },
 ];
@@ -73,10 +73,10 @@ export function DashboardHome() {
       <header className="dashboardTopbar">
         <div>
           <p className="smallTag">Step 2 of 3</p>
-          <h1>Select Your Study Workflow</h1>
+          <h1>Pick a Study Tool</h1>
           <p className="small">
-            Choose the experience you want to run for this document. The next
-            screen opens the full study workspace.
+            Choose what you want to do with this PDF. You'll move into a full
+            workspace in the next step.
           </p>
         </div>
         <div className="row">
@@ -90,7 +90,7 @@ export function DashboardHome() {
       </header>
 
       <section className="panel stepPanel">
-        <h3>Active Document</h3>
+        <h3>Selected File</h3>
         <p className="small">
           {selectedDoc ? selectedDoc.title : "Loading document selection..."}
         </p>

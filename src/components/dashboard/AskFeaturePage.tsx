@@ -23,19 +23,19 @@ export function AskFeaturePage() {
 
   return (
     <FeatureWorkspace
-      title="Contextual Q&A"
-      description="Receive evidence-based answers grounded in your selected lecture material."
+      title="Ask Anything"
+      description="Ask questions about your lecture slides and get clear answers."
     >
       {({ selectedDocIds, selectedDoc, busy, setBusy, setStatus }) => (
         <div>
-          <h3>Ask a Content-Aware Question</h3>
+          <h3>Ask Your Question</h3>
           <p className="small">
             {selectedDoc
               ? `Current document: ${selectedDoc.title}`
               : "Select a document from the left panel first."}
           </p>
           <textarea
-            placeholder="Enter a specific concept, topic, or problem you want clarified..."
+            placeholder="Example: Can you explain this concept in simple terms?"
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
           />
@@ -45,7 +45,7 @@ export function AskFeaturePage() {
             onClick={async () => {
               if (!selectedDoc || !question.trim()) return;
               setBusy(true);
-              setStatus("Generating contextual response...");
+              setStatus("Thinking...");
               try {
                 const response = await asJson<AskResult>(
                   await apiFetch("/api/ask", {
@@ -58,7 +58,7 @@ export function AskFeaturePage() {
                   })
                 );
                 setResult(response);
-                setStatus("Response generated.");
+                setStatus("Answer ready.");
               } catch (error) {
                 setStatus(error instanceof Error ? error.message : "Response generation failed.");
               } finally {
@@ -66,7 +66,7 @@ export function AskFeaturePage() {
               }
             }}
           >
-            Generate Response
+            Get Answer
           </button>
           {result ? (
             <div className="resultCard">

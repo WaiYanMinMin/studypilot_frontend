@@ -68,15 +68,14 @@ function SignUpPageContent() {
     <main className="authShell">
       <section className="authHero">
         <p className="badge">Get started</p>
-        <h1>Create your student account</h1>
+        <h1>Create your study account</h1>
         <p>
-          Save your documents, track quiz practice, and build your own AI-powered
-          study workflow.
+          Save your lecture files, practice with quizzes, and study smarter every week.
         </p>
       </section>
       <section className="authCard">
         <h2>Create Account</h2>
-        <p className="small">Use your details to create an account.</p>
+        <p className="small">It only takes a minute to get started.</p>
         <form className="authForm" onSubmit={onSubmit}>
           <div className="authField">
             <label htmlFor="fullName">Full Name</label>
@@ -109,7 +108,7 @@ function SignUpPageContent() {
               type="password"
               autoComplete="new-password"
               required
-              placeholder="At least 8 characters"
+              placeholder="Choose a strong password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
@@ -121,7 +120,7 @@ function SignUpPageContent() {
               type="password"
               autoComplete="new-password"
               required
-              placeholder="Re-enter your password"
+              placeholder="Type your password again"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
             />

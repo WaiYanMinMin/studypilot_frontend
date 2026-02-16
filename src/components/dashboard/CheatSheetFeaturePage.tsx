@@ -158,14 +158,14 @@ export function CheatSheetFeaturePage() {
 
   return (
     <FeatureWorkspace
-      title="Revision Brief"
-      description="Create a polished study brief with formulas, concepts, and practical cues."
+      title="Cheat Sheet Builder"
+      description="Turn your lecture into a clean cheat sheet for quick revision."
     >
       {({ selectedDoc, selectedDocIds, busy, setBusy, setStatus }) => (
         <div>
-          <h3>Structured Revision Brief</h3>
+          <h3>Build Your Cheat Sheet</h3>
           <p className="small">
-            Produce a clean, exam-ready brief from your selected lecture source.
+            Includes key ideas, formulas, and high-yield notes.
           </p>
           <div className="row">
             <button
@@ -174,7 +174,7 @@ export function CheatSheetFeaturePage() {
               onClick={async () => {
                 if (!selectedDoc) return;
                 setBusy(true);
-                setStatus("Generating revision brief...");
+                setStatus("Building cheat sheet...");
                 try {
                   const response = await asJson<ResourcesResult>(
                     await apiFetch("/api/resources", {
@@ -184,19 +184,19 @@ export function CheatSheetFeaturePage() {
                     })
                   );
                   setCheatSheet(response.cheatSheet);
-                  setStatus("Revision brief generated.");
+                  setStatus("Cheat sheet ready.");
                 } catch (error) {
                   setStatus(
                     error instanceof Error
                       ? error.message
-                      : "Revision brief generation failed."
+                      : "Cheat sheet generation failed."
                   );
                 } finally {
                   setBusy(false);
                 }
               }}
             >
-              Generate Brief
+              Generate Cheat Sheet
             </button>
             <button
               className="ghostButton"
@@ -206,7 +206,7 @@ export function CheatSheetFeaturePage() {
                 setExportingPdf(true);
                 try {
                   await downloadCheatSheetPdfFromPreview(previewRef.current);
-                  setStatus("Formatted PDF downloaded successfully.");
+                  setStatus("PDF downloaded.");
                 } catch (error) {
                   setStatus(
                     error instanceof Error ? error.message : "PDF download failed."
@@ -221,7 +221,7 @@ export function CheatSheetFeaturePage() {
           </div>
           {cheatSheet ? (
             <div className="resultCard">
-              <h4>Revision Brief Preview</h4>
+              <h4>Cheat Sheet Preview</h4>
               <div ref={previewRef} className="cheatSheetPreview">
                 <article className="cheatSheetPreviewBody markdownPreview">
                   <ReactMarkdown

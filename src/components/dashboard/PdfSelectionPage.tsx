@@ -17,7 +17,7 @@ export function PdfSelectionPage() {
   const [selectedDocId, setSelectedDocId] = useState("");
   const [busy, setBusy] = useState(false);
   const [docsLoading, setDocsLoading] = useState(true);
-  const [status, setStatus] = useState("Select a source document to continue.");
+  const [status, setStatus] = useState("Choose a PDF to start studying.");
 
   async function loadDocuments() {
     setDocsLoading(true);
@@ -34,13 +34,13 @@ export function PdfSelectionPage() {
 
   async function uploadPdf(file: File) {
     setBusy(true);
-    setStatus("Uploading and processing document...");
+    setStatus("Uploading your PDF...");
     try {
       const formData = new FormData();
       formData.append("file", file);
       await asJson(await apiFetch("/api/upload", { method: "POST", body: formData }));
       await loadDocuments();
-      setStatus("Upload complete. You can proceed to workflow selection.");
+      setStatus("Upload complete. You're ready for the next step.");
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Upload could not be completed.");
     } finally {
@@ -50,7 +50,7 @@ export function PdfSelectionPage() {
 
   async function deleteDocument(docId: string) {
     setBusy(true);
-    setStatus("Removing selected document...");
+    setStatus("Removing this file...");
     try {
       await asJson(await apiFetch(`/api/documents/${docId}`, { method: "DELETE" }));
       const remaining = docs.filter((doc) => doc.id !== docId);
@@ -58,7 +58,7 @@ export function PdfSelectionPage() {
       if (selectedDocId === docId) {
         setSelectedDocId(remaining[0]?.id || "");
       }
-      setStatus("Document removed successfully.");
+      setStatus("File removed.");
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Document removal failed.");
     } finally {
@@ -75,9 +75,9 @@ export function PdfSelectionPage() {
       <header className="dashboardTopbar">
         <div>
           <p className="smallTag">Step 1 of 3</p>
-          <h1>Select Your Source Document</h1>
+          <h1>Choose Your Lecture PDF</h1>
           <p className="small">
-            Upload a lecture PDF or choose a previously processed document.
+            Upload a new file or pick one you've already uploaded.
           </p>
         </div>
         <div className="row">
@@ -97,7 +97,7 @@ export function PdfSelectionPage() {
       </header>
 
       <section className="panel stepPanel">
-        <h3>Upload New Lecture File</h3>
+        <h3>Upload a New PDF</h3>
         <input
           type="file"
           accept="application/pdf"
@@ -108,7 +108,7 @@ export function PdfSelectionPage() {
           }}
         />
 
-        <h3 style={{ marginTop: 20 }}>Or Select Existing File</h3>
+        <h3 style={{ marginTop: 20 }}>Or Pick an Existing File</h3>
         {docsLoading ? (
           <div className="inlineLoaderWrap">
             <div className="loaderRing" aria-label="Loading documents" />
@@ -146,7 +146,7 @@ export function PdfSelectionPage() {
               router.push(`/dashboard/choose?doc=${encodeURIComponent(selectedDocId)}`)
             }
           >
-            Continue to Workflow Selection
+            Continue to Study Tools
           </button>
         </div>
         <p className="small">Status: {status}</p>

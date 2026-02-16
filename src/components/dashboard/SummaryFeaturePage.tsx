@@ -17,14 +17,14 @@ export function SummaryFeaturePage() {
 
   return (
     <FeatureWorkspace
-      title="Executive Summary"
-      description="Generate a concise, structured briefing from your selected lecture document."
+      title="Quick Summary"
+      description="Get the most important points from your lecture in seconds."
     >
       {({ selectedDoc, selectedDocIds, busy, setBusy, setStatus }) => (
         <div>
-          <h3>Lecture Briefing</h3>
+          <h3>Lecture Summary</h3>
           <p className="small">
-            Synthesize key concepts, frameworks, and important takeaways.
+            Great for revision before class, quizzes, or exams.
           </p>
           <button
             className="ctaButton"
@@ -32,7 +32,7 @@ export function SummaryFeaturePage() {
             onClick={async () => {
               if (!selectedDoc) return;
               setBusy(true);
-              setStatus("Generating executive summary...");
+              setStatus("Creating summary...");
               try {
                 const response = await asJson<ResourcesResult>(
                   await apiFetch("/api/resources", {
@@ -42,7 +42,7 @@ export function SummaryFeaturePage() {
                   })
                 );
                 setSummary(response.summary);
-                setStatus("Executive summary generated.");
+                setStatus("Summary ready.");
               } catch (error) {
                 setStatus(
                   error instanceof Error ? error.message : "Summary generation could not be completed."
@@ -52,11 +52,11 @@ export function SummaryFeaturePage() {
               }
             }}
           >
-            Generate Briefing
+            Generate Summary
           </button>
           {summary ? (
             <div className="resultCard">
-              <h4>Summary Output</h4>
+              <h4>Your Summary</h4>
               <pre>{summary}</pre>
             </div>
           ) : null}

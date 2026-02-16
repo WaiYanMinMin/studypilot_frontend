@@ -16,8 +16,8 @@ export function HighlightFeaturePage() {
 
   return (
     <FeatureWorkspace
-      title="Highlight Analysis"
-      description="Investigate specific excerpts with precision, context-aware analysis."
+      title="Explain My Highlight"
+      description="Highlight any text in the PDF and ask for a simple explanation."
     >
       {({
         selectedDoc,
@@ -28,12 +28,12 @@ export function HighlightFeaturePage() {
         setStatus
       }) => (
         <div>
-          <h3>Analyze a Highlighted Excerpt</h3>
+          <h3>Ask About Highlighted Text</h3>
           <p className="small">
-            Select text in the document viewer, then request a focused explanation.
+            Highlight text in the PDF, then ask what it means.
           </p>
           <textarea
-            placeholder="What would you like clarified about the highlighted section?"
+            placeholder="What is confusing here?"
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
           />
@@ -43,7 +43,7 @@ export function HighlightFeaturePage() {
             onClick={async () => {
               if (!selectedDoc || !highlightText || !question.trim()) return;
               setBusy(true);
-              setStatus("Generating highlight-based analysis...");
+              setStatus("Explaining your highlight...");
               try {
                 const response = await asJson<AskResult>(
                   await apiFetch("/api/ask-highlight", {
@@ -57,7 +57,7 @@ export function HighlightFeaturePage() {
                   })
                 );
                 setResult(response);
-                setStatus("Analysis generated.");
+                setStatus("Explanation ready.");
               } catch (error) {
                 setStatus(
                   error instanceof Error ? error.message : "Highlight analysis failed."
@@ -67,11 +67,11 @@ export function HighlightFeaturePage() {
               }
             }}
           >
-            Analyze Highlight
+            Explain Highlight
           </button>
           {highlightText ? (
             <div className="highlightBox">
-              <strong>Selected Excerpt</strong>
+              <strong>Your Highlight</strong>
               <p>{highlightText}</p>
             </div>
           ) : null}
