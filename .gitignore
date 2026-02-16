@@ -4,3 +4,4 @@ node_modules
 data
 dist
 coverage
+.DS_Store
